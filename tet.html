@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>ملزمة اللغة الإنجليزية — الأستاذ أحمد إبراهيم</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.2/babel.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',Tahoma,Arial,sans-serif;direction:rtl;background:#0d1b4e;}
+::-webkit-scrollbar{height:6px;width:6px;}
+::-webkit-scrollbar-track{background:rgba(255,255,255,.1);}
+::-webkit-scrollbar-thumb{background:rgba(255,215,0,.6);border-radius:3px;}
+button{font-family:inherit;}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useEffect}=React;
+const AUTHOR="الأستاذ أحمد إبراهيم";
+const C={navy:"#0d1b4e",blue:"#1565c0",teal:"#00796b",red:"#c62828",gold:"#ffc107",
+  green:"#2e7d32",purple:"#6a1b9a",orange:"#e65100",pink:"#c2185b",
+  indigo:"#283593",brown:"#5d4037",muted:"#6b7280"};
+
+// ── Atoms ──────────────────────────────────────────────────────────────────
+const Ex=({en,ar,color=C.green})=>(
+  <div style={{background:"#f1f8e9",borderRight:`4px solid ${color}`,borderRadius:8,padding:"6px 11px",margin:"5px 0"}}>
+    <div style={{direction:"ltr",textAlign:"left",color,fontWeight:700,fontSize:12}}>► {en}</div>
+    {ar&&<div style={{color:C.muted,fontSize:11,marginTop:2,textAlign:"right"}}>◄ {ar}</div>}
+  </div>);
+
+const Tip=({children,icon="💡",bc="#f9a825"})=>(
+  <div style={{background:"#fff8e1",borderRight:`4px solid ${bc}`,borderRadius:9,
+    padding:"8px 12px",margin:"7px 0",display:"flex",gap:7,alignItems:"flex-start",direction:"rtl"}}>
+    <span style={{fontSize:15,flexShrink:0}}>{icon}</span>
+    <div style={{fontSize:12,color:"#795548",fontWeight:600,lineHeight:1.8}}>{children}</div>
+  </div>);
+
+const Fm=({text,color=C.navy})=>(
+  <div style={{background:"#f0f4ff",border:`2px solid ${color}22`,borderRadius:8,
+    padding:"7px 12px",fontFamily:"monospace",fontSize:12,color,
+    fontWeight:700,direction:"ltr",textAlign:"left",margin:"6px 0"}}>{text}</div>);
+
+const Quiz=({qs,accent=C.blue})=>{
+  const [sel,setSel]=useState({});
+  const [done,setDone]=useState(false);
+  const [score,setScore]=useState(null);
+  const check=()=>{let s=0;qs.forEach((q,i)=>{if(sel[i]===q.a)s++;});setScore(s);setDone(true);};
+  const reset=()=>{setSel({});setDone(false);setScore(null);};
+  return(
+    <div style={{marginTop:8}}>
+      {qs.map((q,i)=>(
+        <div key={i} style={{background:"#fff",borderRadius:9,padding:"10px 13px",
+          marginBottom:8,border:"1.5px solid #e0e7ff",boxShadow:"0 1px 4px rgba(0,0,0,.05)"}}>
+          <div style={{fontWeight:700,color:C.navy,marginBottom:7,fontSize:12,direction:"ltr",textAlign:"left"}}>
+            <span style={{background:accent,color:"#fff",borderRadius:"50%",width:20,height:20,
+              display:"inline-flex",alignItems:"center",justifyContent:"center",
+              fontSize:10,fontWeight:900,marginRight:6}}>{i+1}</span>
+            {q.q}
+          </div>
+          <div style={{display:"flex",gap:5,flexWrap:"wrap",direction:"ltr"}}>
+            {q.opts.map(o=>{
+              const picked=sel[i]===o,correct=done&&o===q.a,wrong=done&&picked&&o!==q.a;
+              return(
+                <button key={o} onClick={()=>!done&&setSel(s=>({...s,[i]:o}))}
+                  style={{padding:"4px 12px",borderRadius:16,border:"2px solid",
+                    borderColor:correct?C.green:wrong?C.red:picked?accent:"#d1d5db",
+                    background:correct?"#dcfce7":wrong?"#fee2e2":picked?"#dbeafe":"#f9fafb",
+                    color:correct?"#166534":wrong?"#991b1b":picked?C.navy:"#374151",
+                    fontWeight:700,fontSize:11,cursor:done?"default":"pointer",transition:"all .15s"}}>{o}</button>
+              );})}
+          </div>
+          {done&&sel[i]!==q.a&&<div style={{color:C.green,fontSize:11,marginTop:4,fontWeight:700}}>✅ الإجابة: {q.a}</div>}
+        </div>))}
+      <div style={{display:"flex",gap:7,marginTop:4}}>
+        <button onClick={check} disabled={done} style={{padding:"7px 18px",borderRadius:18,border:"none",
+          background:done?"#9ca3af":accent,color:"#fff",fontWeight:800,fontSize:12,cursor:done?"default":"pointer"}}>تحقق ✓</button>
+        <button onClick={reset} style={{padding:"7px 18px",borderRadius:18,border:`2px solid ${accent}`,
+          background:"transparent",color:accent,fontWeight:800,fontSize:12,cursor:"pointer"}}>🔄 إعادة</button>
+      </div>
+      {score!==null&&(
+        <div style={{marginTop:8,padding:"9px 14px",borderRadius:9,fontWeight:800,fontSize:13,textAlign:"center",color:C.navy,
+          background:score===qs.length?"#dcfce7":score>=qs.length/2?"#fef9c3":"#fee2e2",
+          border:`2px solid ${score===qs.length?C.green:score>=qs.length/2?C.gold:C.red}`}}>
+          {score===qs.length?"🏆 ممتاز! كل الإجابات صحيحة!":score===0?"💪 حاول مجدداً!":
+            `👍 ${score}/${qs.length} إجابة صحيحة`}
+        </div>)}
+    </div>);};
+
+const Card=({icon,ar,en,color,children,open:initOpen=true})=>{
+  const [open,setOpen]=useState(initOpen);
+  return(
+    <div style={{borderRadius:14,overflow:"hidden",boxShadow:"0 4px 18px rgba(0,0,0,.1)",marginBottom:18,border:`2px solid ${color}22`}}>
+      <div onClick={()=>setOpen(o=>!o)} style={{background:`linear-gradient(135deg,${color},${color}bb)`,
+        padding:"11px 16px",cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <div style={{display:"flex",alignItems:"center",gap:9}}>
+          <span style={{fontSize:22}}>{icon}</span>
+          <div>
+            <div style={{color:"#fff",fontWeight:900,fontSize:15}}>{ar}</div>
+            <div style={{color:"rgba(255,255,255,.8)",fontSize:11}}>{en}</div>
+          </div>
+        </div>
+        <span style={{color:"#fff",fontSize:18}}>{open?"▲":"▼"}</span>
+      </div>
+      {open&&<div style={{background:"#f8faff",padding:"14px 16px"}}>{children}</div>}
+    </div>);};
+
+const G3=({items})=>(
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:7,margin:"9px 0"}}>
+    {items.map(({label,val,bg,bc})=>(
+      <div key={label} style={{background:bg,border:`2px solid ${bc}`,borderRadius:8,padding:"8px 10px",textAlign:"center"}}>
+        <div style={{color:bc,fontWeight:900,fontSize:11,marginBottom:3}}>{label}</div>
+        <div style={{fontFamily:"monospace",fontSize:10,color:"#333",direction:"ltr",whiteSpace:"pre-line"}}>{val}</div>
+      </div>))}</div>);
+
+const Tbl=({cols,rows,colColors})=>(
+  <div style={{overflowX:"auto",borderRadius:8,boxShadow:"0 2px 7px rgba(0,0,0,.08)",margin:"8px 0"}}>
+    <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+      <thead><tr>{cols.map((c,i)=>(
+        <th key={c} style={{background:colColors?.[i]||C.navy,color:"#fff",padding:"7px 9px",textAlign:"center"}}>{c}</th>
+      ))}</tr></thead>
+      <tbody>{rows.map((r,i)=>(
+        <tr key={i} style={{background:i%2===0?"#f8faff":"#fff"}}>
+          {r.map((c,j)=><td key={j} style={{padding:"6px 9px",textAlign:"center",border:"1px solid #e5e7eb",direction:"ltr",fontWeight:j===0?700:400}}>{c}</td>)}
+        </tr>))}</tbody>
+    </table></div>);
+
+const OppGrid=({pairs})=>(
+  <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:4,margin:"8px 0"}}>
+    {pairs.map(([a,b])=>(
+      <div key={a} style={{display:"flex",borderRadius:6,overflow:"hidden",border:"1.5px solid #e0e7ff"}}>
+        <div style={{background:C.teal,color:"#fff",padding:"5px 9px",fontWeight:700,fontSize:11,flex:1,textAlign:"center"}}>{a}</div>
+        <div style={{background:"#e0f2f1",color:C.teal,padding:"5px 9px",fontWeight:700,fontSize:11,flex:1,textAlign:"center"}}>{b}</div>
+      </div>))}</div>);
+
+const MF=({items})=>(
+  <div style={{marginTop:7}}>
+    {items.map(({m,f,n},i)=>(
+      <div key={i} style={{display:"flex",gap:8,alignItems:"flex-start",
+        background:f?"#e8f5e9":"#ffebee",border:`1.5px solid ${f?C.green:C.red}`,
+        borderRadius:7,padding:"7px 10px",marginBottom:5,direction:"ltr"}}>
+        <span style={{fontSize:16,flexShrink:0}}>{f?"✅":"❌"}</span>
+        <div>
+          <div style={{fontSize:11,fontWeight:700,color:"#333"}}>{m}</div>
+          <div style={{fontSize:10,color:C.muted}}>{n}</div>
+        </div>
+      </div>))}</div>);
+
+// ── Unit metadata ─────────────────────────────────────────────────────────
+const UNITS=[
+  {id:1,label:"📘 Unit One",  color:C.blue,  sub:"وصف المكان، الساعة، الأزمنة المستمرة"},
+  {id:2,label:"📗 Unit Two",  color:C.teal,  sub:"المضارع البسيط، الهوايات، الاقتراح"},
+  {id:3,label:"📙 Unit Three",color:C.orange,sub:"المقارنة والتفضيل، الشرطية if"},
+  {id:4,label:"📕 Unit Four", color:C.red,   sub:"الحياة البرية، قصة إبراهيم، while/when"},
+  {id:5,label:"📓 Unit Five", color:C.purple,sub:"قصة نوال، الكتابة، البرامج التلفزيونية"},
+  {id:6,label:"📔 Unit Six",  color:C.brown, sub:"الوظائف، مدرسة المستقبل، الملخص الشامل"},
+];
+const U1=[{icon:"📍",label:"وصف المكان"},{icon:"🕐",label:"الساعة"},{icon:"⏱️",label:"المضارع المستمر"},
+  {icon:"🕰️",label:"الماضي المستمر"},{icon:"🚗",label:"Car of the Year"},
+  {icon:"🔤",label:"الصفات والمضادات"},{icon:"💬",label:"Give Reason & Polite"},{icon:"📖",label:"القصة والملخص"}];
+const U2=[{icon:"🎯",label:"المضارع البسيط"},{icon:"🎭",label:"أفعال الرغبة"},
+  {icon:"💡",label:"الاقتراح والدعوة"},{icon:"📧",label:"الإيميل والهواية"},{icon:"📺",label:"البرامج والقراءات"}];
+const U3=[{icon:"📊",label:"المقارنة والتفضيل"},{icon:"↔️",label:"as...as والقبول/الرفض"},
+  {icon:"🔀",label:"الشرطية If"},{icon:"🦅",label:"The Fastest Living Things"}];
+const U4=[{icon:"🌿",label:"الحياة البرية"},{icon:"🧑",label:"قصة إبراهيم"},
+  {icon:"⏰",label:"While / When / As"},{icon:"📰",label:"Iraqi Morning News"}];
+const U5=[{icon:"👩‍⚕️",label:"قصة نوال"},{icon:"📝",label:"Write about your life"},
+  {icon:"📺",label:"TV Program — Blue Whale"},{icon:"📰",label:"Story 3 — A Powerful Lesson"}];
+const U6=[{icon:"👔",label:"الوظائف — Jobs"},{icon:"🏫",label:"مدرسة المستقبل"},
+  {icon:"🌍",label:"الملخص الشامل"}];
+const UNIT_TABS=[U1,U2,U3,U4,U5,U6];
+
+// ══ UNIT 1 ══════════════════════════════════════════════════════════════════
+function RenderU1({tab}){switch(tab){
+case 0:return(<>
+  <Card icon="📍" ar="وصف المكان" en="Describing Place" color={C.blue}>
+    <Tip>نصف المكان باستخدام <strong>there is / there are</strong> للتعبير عن وجود شيء في مكان ما</Tip>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9,marginBottom:11}}>
+      <div style={{background:"#e3f2fd",border:`2px solid ${C.blue}`,borderRadius:10,padding:11}}>
+        <div style={{color:C.blue,fontWeight:900,fontSize:13,marginBottom:5}}>There is (isn't) + مفرد</div>
+        <Fm text="There is + a/an + noun + place" color={C.blue}/>
+        <Ex en="There is a tree in the park." ar="يوجد شجرة في الحديقة"/>
+        <Ex en="There is an apple on the table." ar="يوجد تفاحة على المنضدة"/>
+      </div>
+      <div style={{background:"#f3e5f5",border:`2px solid ${C.purple}`,borderRadius:10,padding:11}}>
+        <div style={{color:C.purple,fontWeight:900,fontSize:13,marginBottom:5}}>There are (aren't) + جمع</div>
+        <Fm text="There are + plural noun + place" color={C.purple}/>
+        <Ex en="There are two books in the room." ar="يوجد كتابان في الغرفة" color={C.purple}/>
+        <Ex en="There are some birds on the tree." ar="يوجد بعض الطيور على الشجرة" color={C.purple}/>
+      </div>
+    </div>
+    <Tip icon="⚠️">أدوات النفي مثل <strong>any</strong>: There ………. any shops in the mall. (are , aren't)</Tip>
+    <div style={{marginTop:10}}>
+      <div style={{background:C.navy,color:C.gold,fontWeight:800,padding:"6px 12px",borderRadius:"8px 8px 0 0",fontSize:12}}>✏️ تدريب</div>
+      <Quiz accent={C.blue} qs={[
+        {q:"There ……… a big garden behind my house.",opts:["is","are","were"],a:"is"},
+        {q:"There ……… many shops in the mall.",opts:["is","are","was"],a:"are"},
+        {q:"There ……… some flowers in the vase.",opts:["is","are","am"],a:"are"},
+        {q:"There ……… an old book on the shelf.",opts:["is","are","were"],a:"is"},
+      ]}/>
+    </div>
+  </Card></>);
+case 1:return(<>
+  <Card icon="🕐" ar="الساعة — Time" en="Telling the Time" color={C.teal}>
+    {[{r:"1",t:"الساعة بالتمام",f:"It is + (number) + o'clock",ex:"5:00 → It is five o'clock | 9:00 → It is nine o'clock",c:C.green},
+      {r:"2",t:"الدقائق ≤ 30 → past",f:"It is + minutes + past + hour",ex:"5:10→ten past five | 7:15→a quarter past seven | 8:30→half past eight",c:C.blue},
+      {r:"3",t:"الدقائق > 30 → to",f:"It is + (60−min) + to + next hour",ex:"5:50→ten to six | 8:45→a quarter to nine",c:C.purple},
+    ].map(({r,t,f,ex,c})=>(
+      <div key={r} style={{background:"#fff",border:`2px solid ${c}`,borderRadius:10,overflow:"hidden",marginBottom:8}}>
+        <div style={{background:c,color:"#fff",padding:"5px 11px",fontWeight:800,fontSize:12}}>📌 Rule {r} — {t}</div>
+        <div style={{padding:"9px 11px"}}><Fm text={f} color={c}/>
+          <div style={{direction:"ltr",fontSize:11,color:"#333"}}>{ex}</div>
+        </div>
+      </div>))}
+    <Tip>نستخدم <strong>a quarter</strong> للربع (15 دقيقة) و <strong>half</strong> للنصف (30 دقيقة)</Tip>
+    <div style={{marginTop:9}}>
+      <div style={{background:C.navy,color:C.gold,fontWeight:800,padding:"6px 12px",borderRadius:"8px 8px 0 0",fontSize:12}}>🕐 تدريب</div>
+      <Quiz accent={C.teal} qs={[
+        {q:"12:00 = ?",opts:["It is twelve o'clock","half past twelve","twelve past zero"],a:"It is twelve o'clock"},
+        {q:"6:30 = ?",opts:["It is half past six","thirty to six","It is six thirty"],a:"It is half past six"},
+        {q:"4:15 = ?",opts:["a quarter past four","fifteen to four","four and quarter"],a:"a quarter past four"},
+        {q:"10:45 = ?",opts:["a quarter to eleven","It is ten forty-five","forty-five past ten"],a:"a quarter to eleven"},
+        {q:"11:50 = ?",opts:["It is ten to twelve","fifty past eleven","It is eleven fifty"],a:"It is ten to twelve"},
+      ]}/>
+    </div>
+  </Card></>);
+case 2:return(<>
+  <Card icon="⏱️" ar="المضارع المستمر" en="Present Continuous" color={C.blue}>
+    <div style={{background:"#e8f5e9",border:`2px solid ${C.green}`,borderRadius:8,padding:"7px 11px",direction:"ltr",marginBottom:10}}>
+      <span style={{fontWeight:800,color:C.green}}>🔑 Signals: </span>
+      <span style={{fontWeight:600,fontSize:12}}>now, at the moment, at the present time, today, look!, listen!</span>
+    </div>
+    <G3 items={[
+      {label:"✅ إثبات",val:"am/is/are + verb-ing",bg:"#e8f5e9",bc:C.green},
+      {label:"❌ نفي",val:"am/is/are + not + v-ing",bg:"#ffebee",bc:C.red},
+      {label:"❓ سؤال",val:"Am/Is/Are + sub + v-ing?",bg:"#e3f2fd",bc:C.blue},
+    ]}/>
+    <Tbl cols={["الضمير","المساعد","مثال"]} colColors={[C.navy,C.blue,C.teal]}
+      rows={[["I","am","I am writing a letter today."],
+        ["He/She/It","is","She is cooking lunch now."],
+        ["They/We/You","are","They are studying at the moment."]]}/>
+    <div style={{background:"#fff9c4",borderRadius:9,padding:10,border:`2px solid #f9a825`,marginTop:9}}>
+      <div style={{fontWeight:800,color:C.navy,marginBottom:6,fontSize:12}}>📌 قواعد إضافة -ing</div>
+      {[{n:"1",r:"الفعل العادي → أضف ing",ex:"play→playing, eat→eating",c:C.teal},
+        {n:"2",r:"ينتهي بـ e → احذفها وأضف ing",ex:"come→coming, write→writing",c:C.blue},
+        {n:"3",r:"صامت+علة+صامت → ضاعف الصامت",ex:"sit→sitting, stop→stopping",c:C.purple},
+        {n:"4",r:"ينتهي بـ ie → y ثم ing",ex:"lie→lying, die→dying",c:C.red},
+      ].map(({n,r,ex,c})=>(
+        <div key={n} style={{display:"flex",gap:7,marginBottom:5,direction:"rtl",alignItems:"flex-start"}}>
+          <span style={{background:c,color:"#fff",borderRadius:"50%",width:19,height:19,
+            display:"flex",alignItems:"center",justifyContent:"center",fontSize:10,fontWeight:900,flexShrink:0}}>{n}</span>
+          <div><div style={{fontWeight:700,color:C.navy,fontSize:11}}>{r}</div>
+            <div style={{fontFamily:"monospace",fontSize:10,color:c,direction:"ltr"}}>{ex}</div>
+          </div>
+        </div>))}
+    </div>
+    <div style={{marginTop:9}}>
+      <div style={{background:C.navy,color:C.gold,fontWeight:800,padding:"6px 12px",borderRadius:"8px 8px 0 0",fontSize:12}}>✏️ تدريب</div>
+      <Quiz accent={C.blue} qs={[
+        {q:"She ……… (do) the homework today.",opts:["is doing","are doing","was doing"],a:"is doing"},
+        {q:"swim → -ing form?",opts:["swiming","swimming","swimm"],a:"swimming"},
+        {q:"drive → -ing form?",opts:["driveing","driving","drived"],a:"driving"},
+        {q:"lie → -ing form?",opts:["lieing","lying","lied"],a:"lying"},
+      ]}/>
+    </div>
+  </Card></>);
+case 3:return(<>
+  <Card icon="🕰️" ar="الماضي المستمر" en="Past Continuous" color={C.purple}>
+    <div style={{background:"#f3e5f5",border:`2px solid ${C.purple}`,borderRadius:8,padding:"7px 11px",direction:"ltr",marginBottom:10}}>
+      <span style={{fontWeight:800,color:C.purple}}>🔑 Signals: </span>
+      <span style={{fontWeight:600,fontSize:12}}>when, while, at + past time, all day yesterday</span>
+    </div>
+    <G3 items={[
+      {label:"✅ إثبات",val:"was/were + verb-ing",bg:"#e8f5e9",bc:C.green},
+      {label:"❌ نفي",val:"wasn't/weren't + v-ing",bg:"#ffebee",bc:C.red},
+      {label:"❓ سؤال",val:"Was/Were + sub + v-ing?",bg:"#f3e5f5",bc:C.purple},
+    ]}/>
+    <Tbl cols={["الضمير","was/were","مثال"]} colColors={[C.purple,C.blue,C.teal]}
+      rows={[["She/He/It/I","was","She was reading a book."],
+        ["They/We/You","were","They were watching TV at 8."]]}/>
+    <Ex en="She was reading when he called." ar="كانت تقرأ عندما اتصل — ماضي مستمر + بسيط" color={C.purple}/>
+    <Ex en="Jack wasn't writing the lesson in his notebook." ar="لم يكن جاك يكتب الدرس" color={C.red}/>
+    <div style={{marginTop:9}}>
+      <div style={{background:C.navy,color:C.gold,fontWeight:800,padding:"6px 12px",borderRadius:"8px 8px 0 0",fontSize:12}}>✏️ تدريب</div>
+      <Quiz accent={C.purple} qs={[
+        {q:"She ……… a book when I arrived.",opts:["was reading","is reading","reads"],a:"was reading"},
+        {q:"Tarek ……… (not write) the lesson.",opts:["wasn't writing","weren't writing","isn't writing"],a:"wasn't writing"},
+        {q:"They ……… TV at 8 o'clock.",opts:["were watching","was watching","are watching"],a:"were watching"},
+      ]}/>
+    </div>
+  </Card></>);
+case 4:return(<>
+  <Card icon="🚗" ar="سيارة السنة P.7" en="Car of the Year" color={C.red}>
+    <Tbl cols={["الخاصية","التفاصيل"]} colColors={[C.red,C.navy]} rows={[
+      ["Name","Panther"],["Seats","8 people"],["Km/litre","12 km"],
+      ["Safety","Airbags + many features"],["Extras","CDs, sunroof, CD Player, tinted windows"]]}/>
+    <div style={{marginTop:10}}>
+      {[{s:`Car of the year is called "Panther 4x4".`,a:"T",n:"صحيح"},
+        {s:"Some young men are not interested in its engine.",a:"F",n:"خطأ — هم مهتمون جداً"},
+        {s:"Panther has NO standard features.",a:"F",n:"خطأ — لديها ميزات قياسية"},
+        {s:`There's loads of space inside "Panther 3000".`,a:"T",n:"صحيح"},
+        {s:"Panther has seats for 6 people.",a:"F",n:"خطأ — 8 مقاعد"},
+        {s:"The Panther 3000 is actually very expensive.",a:"F",n:"خطأ — غير مكلفة"},
+        {s:"The Panther has airbags for driver & passengers.",a:"T",n:"صحيح"},
+      ].map(({s,a,n},i)=>(
+        <div key={i} style={{display:"flex",alignItems:"flex-start",gap:7,
+          background:a==="T"?"#e8f5e9":"#ffebee",border:`1.5px solid ${a==="T"?C.green:C.red}`,
+          borderRadius:7,padding:"6px 9px",marginBottom:5,direction:"ltr"}}>
+          <span style={{background:a==="T"?C.green:C.red,color:"#fff",borderRadius:"50%",
+            width:22,height:22,display:"flex",alignItems:"center",justifyContent:"center",
+            fontSize:11,fontWeight:900,flexShrink:0}}>{a}</span>
+          <div><div style={{fontSize:11,fontWeight:600,color:"#333"}}>{s}</div>
+            <div style={{fontSize:10,color:C.muted}}>{n}</div>
+          </div>
+        </div>))}
+    </div>
+  </Card></>);
+case 5:return(<>
+  <Card icon="🔤" ar="ترتيب الصفات" en="Adjective Order" color={C.orange}>
+    <div style={{background:"#fff3e0",borderRadius:9,padding:9,marginBottom:10,textAlign:"center"}}>
+      <div style={{fontWeight:900,color:C.orange,marginBottom:6,fontSize:11}}>📌 الترتيب الصحيح:</div>
+      <div style={{display:"flex",gap:3,flexWrap:"wrap",justifyContent:"center"}}>
+        {["أدوات التعريف","صفة عامة","حجم","عمر","شكل","لون","جنسية","مادة","الاسم"].map((w,i)=>(
+          <span key={w} style={{background:`hsl(${30+i*18},65%,${48+i}%)`,color:"#fff",
+            borderRadius:12,padding:"2px 8px",fontSize:10,fontWeight:700}}>{w}</span>))}
+      </div>
+    </div>
+    <Ex en="(black long nice) hair → nice long black hair" color={C.orange}/>
+    <Ex en="(French white short nice) → nice short white French" color={C.orange}/>
+    <Tip icon="📌">إذا كان لديك لونان تضع بينهما <strong>and</strong> مثل: beautiful green and red house</Tip>
+    <Quiz accent={C.orange} qs={[
+      {q:"shatha has ……. hair and brown eyes.",opts:["beautiful straight black","straight black beautiful","black beautiful straight"],a:"beautiful straight black"},
+      {q:"Hassan has a …… jacket.",opts:["beautiful French White","French White beautiful","White French beautiful"],a:"beautiful French White"},
+    ]}/>
+  </Card>
+  <Card icon="🔄" ar="المضادات" en="Opposites" color={C.teal}>
+    <OppGrid pairs={[["Safe","dangerous"],["Active","lazy"],["Expensive","cheap"],["Quiet","noisy"],
+      ["Young","Old"],["Interesting","boring"],["Tall","short"],["Important","unimportant"],
+      ["Beautiful","ugly"],["Good","bad"],["Fat","thin"],["Clever","stupid"],["Friendly","unfriendly"]]}/>
+  </Card>
+  <Card icon="✨" ar="Really & Quite" en="Intensifiers" color={C.purple}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:9}}>
+      <div style={{background:"#f3e5f5",border:`2px solid ${C.purple}`,borderRadius:9,padding:10}}>
+        <div style={{color:C.purple,fontWeight:900,fontSize:13,marginBottom:5}}>Really — جداً</div>
+        <Fm text="Really + a/an + adj + noun" color={C.purple}/>
+        <Ex en="It was a really interesting book." ar="كان كتاباً ممتعاً جداً" color={C.purple}/>
+      </div>
+      <div style={{background:"#e8f5e9",border:`2px solid ${C.green}`,borderRadius:9,padding:10}}>
+        <div style={{color:C.green,fontWeight:900,fontSize:13,marginBottom:5}}>Quite — إلى حدٍّ ما</div>
+        <Fm text="Quite + a/an + adj + noun" color={C.green}/>
+        <Ex en="It was quite a good film." ar="كان فيلماً جيداً إلى حدٍّ ما" color={C.green}/>
+      </div>
+    </div>
+    <Quiz accent={C.purple} qs={[
+      {q:"He was a ……. good person. (strong approval)",opts:["really","quite"],a:"really"},
+      {q:"The bar is a ……. nice place. (moderate)",opts:["really","quite"],a:"quite"},
+    ]}/>
+  </Card></>);
+case 6:return(<>
+  <Card icon="💬" ar="إعطاء السبب" en="Give Reason" color={C.orange}>
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      <div style={{background:"#fff3e0",border:`2px solid ${C.orange}`,borderRadius:9,padding:10}}>
+        <div style={{fontWeight:800,color:C.orange,fontSize:12,marginBottom:5}}>📌 Rule 1 — so that + you + verb</div>
+        <Fm text="… so (that) + you + verb …" color={C.orange}/>
+        <Ex en="Cars have sunroof so that they can let the light in." ar="السيارات لها نافذة لإدخال الضوء" color={C.orange}/>
+        <Ex en="There is a new school so that you can study English." color={C.orange}/>
+      </div>
+      <div style={{background:"#e3f2fd",border:`2px solid ${C.blue}`,borderRadius:9,padding:10}}>
+        <div style={{fontWeight:800,color:C.blue,fontSize:12,marginBottom:5}}>📌 Rule 2 — to + verb</div>
+        <Fm text="… to + verb …" color={C.blue}/>
+        <Ex en="There is a new mall to buy things." ar="يوجد مول جديد لشراء الأشياء" color={C.blue}/>
+      </div>
+    </div>
+  </Card>
+  <Card icon="😊" ar="الوصف المؤدب" en="Being Polite with can't" color={C.teal}>
+    <Tbl cols={["القاعدة","المعنى","مثال"]} colColors={[C.teal,C.blue,C.green]} rows={[
+      ["is + is","a bit + صفة","She is lazy → She is a bit lazy."],
+      ["is + isn't","very + معاكسة","She is lazy → She isn't very hardworking."],
+      ["can't + is","not very good at + ing","He can't swim → He is not very good at swimming."],
+      ["can't + can't","very well","She can't stand → She can't stand very well."],
+    ]}/>
+    <Quiz accent={C.teal} qs={[
+      {q:"He can't play football. → polite?",opts:["He is not very good at playing football.","He can't playing.","He doesn't football."],a:"He is not very good at playing football."},
+      {q:"She is fat. → polite?",opts:["She is not very thin.","She is not fat.","She can't thin."],a:"She is not very thin."},
+    ]}/>
+  </Card></>);
+case 7:return(<>
+  <Card icon="📖" ar="قصة — Lucky Customer 50" en="Story Time 1" color={C.purple}>
+    <div style={{background:"linear-gradient(135deg,#f3e5f5,#e8eaf6)",borderRadius:9,padding:10,marginBottom:10,border:`2px solid ${C.purple}`}}>
+      <div style={{fontWeight:900,color:C.purple,fontSize:13,marginBottom:7}}>👤 شخصية كريم</div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+        {["هادئ","مجتهد","خيال واسع","يحب الشعر","حلمه شاعر مشهور"].map(t=>(
+          <span key={t} style={{background:C.purple,color:"#fff",borderRadius:16,padding:"2px 10px",fontSize:10,fontWeight:700}}>{t}</span>))}
+      </div>
+    </div>
+    {[{q:"1. Describe Kareem's character.",en:"He is a quiet, hardworking and very imaginative.",ar:"هادئ، مجتهد، وذو خيال واسع"},
+      {q:"2. Name of the book & poet?",en:"It is islands of salts. The poet was Mudhafar Al-Nawab.",ar:"جزر الأملاح — مظفر النواب"},
+      {q:"3. Why had Kareem been saving?",en:"Because he wanted to be the first to buy the new book.",ar:"أراد أن يكون أول من يشتري الكتاب"},
+      {q:"4. What was Kareem's dream?",en:"He wanted to be a famous poet one day.",ar:"أراد أن يكون شاعراً مشهوراً"},
+      {q:"5. What was Kareem's big prize?",en:"He will get to meet Al-Nawab.",ar:"سيتمكن من مقابلة النواب"},
+      {q:"6. Was Kareem the first to buy the book?",en:"No, he was the 50th customer.",ar:"لا، كان الزبون رقم 50"},
+    ].map(({q,en,ar},i)=>(
+      <div key={i} style={{padding:"7px 0",borderBottom:i<5?"1px solid #f0f4ff":"none"}}>
+        <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:3}}>{q}</div>
+        <div style={{direction:"ltr",color:C.green,fontWeight:600,fontSize:11}}>► {en}</div>
+        <div style={{color:C.muted,fontSize:10,marginTop:1}}>◄ {ar}</div>
+      </div>))}
+    <MF items={[
+      {m:"Kareem was the 1st customer.",f:false,n:"خطأ — كان الزبون الخمسون"},
+      {m:"His prize was money.",f:false,n:"خطأ — الجائزة: مقابلة الشاعر"},
+      {m:"Kareem spent free time reading & writing poems.",f:true,n:"صحيح ✅"},
+      {m:"The book was about rain islands.",f:false,n:"خطأ — جزر الأملاح"},
+    ]}/>
+  </Card></>);
+default:return null;}}
+
+// ══ UNIT 2 ══════════════════════════════════════════════════════════════════
+function RenderU2({tab}){switch(tab){
+case 0:return(<>
+  <Card icon="🎯" ar="المضارع البسيط" en="Present Simple" color={C.teal}>
+    <div style={{background:"#e0f2f1",border:`2px solid ${C.teal}`,borderRadius:8,padding:"7px 11px",direction:"ltr",marginBottom:10}}>
+      <span style={{fontWeight:800,color:C.teal}}>🔑 Signals: </span>
+      <span style={{fontWeight:600,fontSize:12}}>each, every, sometimes, always, never, often, usually</span>
+    </div>
+    <G3 items={[
+      {label:"✅ إثبات",val:"He/She/It → verb+s\nI/We/They → verb",bg:"#e8f5e9",bc:C.green},
+      {label:"❌ نفي",val:"doesn't (he/she/it)\ndon't (I/we/you) + verb",bg:"#ffebee",bc:C.red},
+      {label:"❓ سؤال",val:"Does (he/she/it)\nDo (I/we/you) + verb?",bg:"#e0f2f1",bc:C.teal},
+    ]}/>
+    <Tip>قواعد (s): ينتهي بـ (sh,ch,x,o) → es | ينتهي بـ y بعد صامت → ies</Tip>
+    <Ex en="She sometimes cooks the food." ar="هي أحياناً تطبخ الطعام" color={C.green}/>
+    <Ex en="He doesn't drink coffee. (Negative)" color={C.red}/>
+    <Ex en="Does she sometimes eat the fruits? (Question)" color={C.blue}/>
+    <Quiz accent={C.teal} qs={[
+      {q:"She sometimes ……. (cook) the food.",opts:["cooks","cook","cooking"],a:"cooks"},
+      {q:"They usually ……. the homework. (Negative)",opts:["don't write","doesn't write","aren't writing"],a:"don't write"},
+      {q:"……. she sometimes eat the fruits?",opts:["Does","Do","Is"],a:"Does"},
+      {q:"She ……. (be) a teacher.",opts:["is","are","am"],a:"is"},
+    ]}/>
+  </Card></>);
+case 1:return(<>
+  <Card icon="🎭" ar="أفعال الرغبة والتفضيل" en="Verbs of Liking & Preference" color={C.blue}>
+    <Fm text="love / enjoy / like / dislike / hate + verb-ing" color={C.blue}/>
+    <Ex en="She hates being late." ar="هي تكره التأخير" color={C.blue}/>
+    <Ex en="He likes drinking coffee in the morning." ar="يحب شرب القهوة صباحاً" color={C.blue}/>
+    <Fm text="I'd like / I'd love + to + verb (تفضيل مؤدب)" color={C.green}/>
+    <Ex en="I'd like to go to the cinema." ar="أود الذهاب إلى السينما" color={C.green}/>
+    <Fm text="I prefer + verb-ing + to + verb-ing (مقارنة تفضيل)" color={C.purple}/>
+    <Ex en="I prefer swimming to running." ar="أفضل السباحة على الجري" color={C.purple}/>
+    <Quiz accent={C.blue} qs={[
+      {q:"She hates ……. late.",opts:["being","be","to be"],a:"being"},
+      {q:"I'd like ……. to the cinema.",opts:["to go","going","go"],a:"to go"},
+      {q:"How about ……. to the park?",opts:["going","go","to go"],a:"going"},
+      {q:"Let's ……. fishing.",opts:["go","to go","going"],a:"go"},
+    ]}/>
+  </Card></>);
+case 2:return(<>
+  <Card icon="💡" ar="الاقتراح والدعوة" en="Suggestions & Invitations" color={C.orange}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+      <div style={{background:"#fff3e0",border:`2px solid ${C.orange}`,borderRadius:9,padding:9}}>
+        <div style={{color:C.orange,fontWeight:800,fontSize:12,marginBottom:5}}>💡 اقتراح</div>
+        {["How about + going?","Let's + go","Why not + go?","I'd rather + go"].map(f=><Fm key={f} text={f} color={C.orange}/>)}
+      </div>
+      <div style={{background:"#e8eaf6",border:`2px solid ${C.indigo}`,borderRadius:9,padding:9}}>
+        <div style={{color:C.indigo,fontWeight:800,fontSize:12,marginBottom:5}}>📋 دعوة</div>
+        <Fm text="Would you like to + verb?" color={C.indigo}/>
+        <Fm text="Are you free + day?" color={C.indigo}/>
+        <Ex en="Would you like to come to the event?" color={C.indigo}/>
+      </div>
+    </div>
+    <Quiz accent={C.orange} qs={[
+      {q:"How about ……. to the park?",opts:["going","go","to go"],a:"going"},
+      {q:"She enjoys ……. to the music.",opts:["listening","listen","to listen"],a:"listening"},
+      {q:"……. you like to come to the event?",opts:["Would","Will","Can"],a:"Would"},
+      {q:"I'd love ……. TV.",opts:["watching","to watch","watch"],a:"watching"},
+    ]}/>
+  </Card></>);
+case 3:return(<>
+  <Card icon="📧" ar="كتابة الإيميل — وصف صديق" en="Write an E-mail — P.15" color={C.blue}>
+    <Tip icon="📌">سؤال امتحاني متكرر — (2017-1) (2018-Feb)</Tip>
+    <div style={{background:"#e3f2fd",border:`2px solid ${C.blue}`,borderRadius:9,padding:11,direction:"ltr",marginBottom:10}}>
+      <div style={{fontWeight:700,color:C.navy,marginBottom:5,fontSize:12}}>📧 Sample E-mail</div>
+      <div style={{background:"#fff",borderRadius:7,padding:10,fontSize:11,color:"#333",lineHeight:1.9}}>
+        <b>Dear Ahmed,</b><br/>
+        How are you? There is a new boy in our class. He came to the school last week.
+        He's called Ali. He's really <b>friendly</b> and <b>outgoing</b>. He loves meeting new people.
+        He's also very <b>sporty</b> and really good at tennis. He's quite <b>tall</b>, with short black hair.
+        He is very kind. I like him and he likes me too.<br/>e–mail me soon,<br/><b>Majed</b>
+      </div>
+    </div>
+    <div style={{background:"#f0fdf4",borderRadius:9,padding:9,marginBottom:10}}>
+      <div style={{fontWeight:800,color:C.navy,marginBottom:5,fontSize:12}}>🏆 الهواية — P.25</div>
+      {[{q:"1. What is a hobby?",en:"Something you do in your spare time for enjoyment and relaxation.",ar:"شيء تفعله في وقت فراغك للمتعة والاسترخاء"},
+        {q:"5. How do many people find fishing?",en:"They find it relaxing than anything else.",ar:"يجدونه مريحاً أكثر من أي شيء آخر"},
+        {q:"8. Can a hobby turn into a job?",en:"Yes, it can.",ar:"نعم، يمكن ذلك"},
+      ].map(({q,en,ar},i)=>(
+        <div key={i} style={{padding:"6px 0",borderBottom:i<2?"1px solid #dcfce7":"none"}}>
+          <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:2}}>{q}</div>
+          <div style={{direction:"ltr",color:C.green,fontWeight:600,fontSize:11}}>► {en}</div>
+          <div style={{color:C.muted,fontSize:10}}>◄ {ar}</div>
+        </div>))}
+    </div>
+  </Card></>);
+case 4:return(<>
+  <Card icon="📺" ar="مفاتيح إجابات — A TV Comedy" en="Answer Keys AB Pages 23–26" color={C.purple}>
+    <Tbl cols={["المصدر","الإجابات"]} colColors={[C.purple,C.navy]} rows={[
+      ["AB. A. Page 23","1-comedy program | 2-about 200 girls | 3-TV company phoned mother | 4-six months | 5-lesson after filming"],
+      ["AB. B. Page 24","1-actor | 2-comedy | 3-character | 4-were call | 5-call | 6-took | 7-social | 8-her"],
+      ["AB. A. Page 24","1-e | 2-d | 3-c | 4-f | 5-b | 6-a"],
+      ["AB. A. Page 25","1-F | 2-T | 3-F | 4-F | 5-F | 6-T"],
+      ["AB. B. Page 26","1-d | 2-e | 3-a | 4-b | 5-c"],
+    ]}/>
+    <MF items={[
+      {m:"There were only 10 girls at the TV test.",f:false,n:"خطأ — حوالي 200 فتاة"},
+      {m:"It took six months to complete the show.",f:true,n:"صحيح ✅"},
+      {m:"She had lessons after filming each day.",f:true,n:"صحيح ✅"},
+    ]}/>
+  </Card></>);
+default:return null;}}
+
+// ══ UNIT 3 ══════════════════════════════════════════════════════════════════
+function RenderU3({tab}){switch(tab){
+case 0:return(<>
+  <Card icon="📊" ar="المقارنة والتفضيل" en="Comparative & Superlative" color={C.orange}>
+    <Tbl cols={["النوع","القاعدة","مثال"]} colColors={[C.orange,C.blue,C.teal]} rows={[
+      ["مقطع واحد عادي","+ er / est","fast → faster → fastest"],
+      ["ينتهي بـ e","+ r / st","nice → nicer → nicest"],
+      ["صامت+علة+صامت","ضاعف الصامت","big → bigger → biggest"],
+      ["ينتهي بـ y","y→i ثم er/est","happy → happier → happiest"],
+      ["مقطعان أو أكثر","more / most","attractive → more → most attractive"],
+    ]}/>
+    <div style={{background:"#fff3e0",border:`2px solid ${C.orange}`,borderRadius:9,padding:9,marginTop:9}}>
+      <div style={{fontWeight:800,color:C.orange,fontSize:12,marginBottom:6}}>⚠️ الكلمات الشاذة</div>
+      <Tbl cols={["Adjective","Comparative","Superlative"]} colColors={[C.navy,C.blue,C.teal]} rows={[
+        ["Good","Better","Best"],["Bad","Worse","Worst"],["Far","Farther","Farthest"]]}/>
+    </div>
+    <Tip>عند وجود <strong>than</strong> → صيغة مقارنة | عند وجود <strong>the</strong> → صيغة تفضيل</Tip>
+    <Quiz accent={C.orange} qs={[
+      {q:"She is the ……. (formal) girl.",opts:["most formal","more formal","formaler"],a:"most formal"},
+      {q:"They are ……. (good) than John's team.",opts:["better","gooder","more good"],a:"better"},
+      {q:"big → superlative?",opts:["biggest","bigest","most big"],a:"biggest"},
+      {q:"happy → comparative?",opts:["happier","more happy","happyer"],a:"happier"},
+    ]}/>
+  </Card></>);
+case 1:return(<>
+  <Card icon="↔️" ar="المقارنة as...as" en="as...as & Agreement/Disagreement" color={C.blue}>
+    <Fm text="التكملة + as + الصفة + as + الاسم الثاني" color={C.blue}/>
+    <Ex en="Cows are as big as goats." ar="الأبقار بنفس ضخامة الماعز" color={C.blue}/>
+    <Ex en="Goats aren't as big as cows." ar="الماعز ليست بضخامة الأبقار" color={C.blue}/>
+    <div style={{marginTop:9,background:"#e0f2f1",border:`2px solid ${C.teal}`,borderRadius:9,padding:10}}>
+      <div style={{fontWeight:800,color:C.teal,fontSize:12,marginBottom:6}}>📌 القبول والرفض</div>
+      <Tbl cols={["الرفض Disagree","القبول Agree"]} colColors={[C.red,C.green]} rows={[
+        ["I don't (مثبت)","So do I"],["I do (منفي)","Neither do I"]]}/>
+      <Ex en="Let's play chess. (Accept) → So do I." color={C.teal}/>
+      <Ex en="AB. A. Page 38: 1-So do I | 2-Neither do I | 3-Neither am I | 4-So am I | 5-I don't mind" color={C.teal}/>
+    </div>
+  </Card></>);
+case 2:return(<>
+  <Card icon="🔀" ar="جملة الشرطية If" en="If Conditional" color={C.indigo}>
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      <div style={{background:"#e8eaf6",border:`2px solid ${C.indigo}`,borderRadius:9,padding:10}}>
+        <div style={{fontWeight:800,color:C.indigo,fontSize:13,marginBottom:5}}>📌 الحالة الأولى — First Conditional</div>
+        <div style={{background:"#ffd600",borderRadius:8,padding:"7px 11px",fontWeight:900,color:C.navy,fontSize:12,textAlign:"center",marginBottom:7}}>
+          If + مضارع بسيط , مستقبل بسيط (will + V1)
+        </div>
+        <Fm text="If + V1 (present simple) , will + V1" color={C.indigo}/>
+        <Ex en="If he buys a camera, he will take some pictures." ar="إذا اشترى كاميرا، سيلتقط صوراً" color={C.indigo}/>
+        <Tip>في حالة النفي: doesn't/don't للمضارع | won't/will not للمستقبل</Tip>
+      </div>
+      <div style={{background:"#f3e5f5",border:`2px solid ${C.purple}`,borderRadius:9,padding:10}}>
+        <div style={{fontWeight:800,color:C.purple,fontSize:13,marginBottom:5}}>📌 الحالة الثانية — Second Conditional</div>
+        <div style={{background:C.purple,borderRadius:8,padding:"7px 11px",fontWeight:900,color:"#fff",fontSize:12,textAlign:"center",marginBottom:7}}>
+          If + ماضي بسيط , would + فعل مجرد
+        </div>
+        <Fm text="If + past simple , would + V1" color={C.purple}/>
+        <Ex en="If he bought a camera, he would take some pictures." color={C.purple}/>
+      </div>
+    </div>
+    <Quiz accent={C.indigo} qs={[
+      {q:"if I had lots of money, I ……. buy a new car.",opts:["would","will","am"],a:"would"},
+      {q:"if there were no spider, there ……. be more insects.",opts:["would","will","can"],a:"would"},
+      {q:"your sister ……. miss the bus if she doesn't get up soon.",opts:["will","would","won't"],a:"will"},
+      {q:"AB. A. Page 40 — Q1 The fastest things?",opts:["Falcons","Lions","Cheetahs"],a:"Falcons"},
+    ]}/>
+  </Card></>);
+case 3:return(<>
+  <Card icon="🦅" ar="الأشياء الحية الأسرع في العالم" en="The Fastest Living Things" color={C.green}>
+    <Tip icon="📌">سؤال امتحاني متكرر — (2017-1) (2017-Feb) (2018-Feb)</Tip>
+    {[{q:"1. What are the fastest things in the natural world?",en:"Falcons.",ar:"الصقور"},
+      {q:"2. How fast can falcons dive?",en:"They can dive at 240 kph.",ar:"يمكنهم الغوص بـ 240 كم/ساعة"},
+      {q:"3. Who are the Bedouin?",en:"They are the people from the desert of Arabica.",ar:"هم الناس من الصحراء العربية"},
+      {q:"4. Why did the Bedouin live on dates, milk and bread?",en:"Because it was difficult to catch animals and birds.",ar:"لأنه من الصعب عليهم صيد الحيوانات"},
+      {q:"5. What was the favorite bird for the Bedouin to catch?",en:"It was the large long-legged houbara.",ar:"الحبارى الكبيرة والطويلة الأرجل"},
+    ].map(({q,en,ar},i)=>(
+      <div key={i} style={{padding:"7px 0",borderBottom:i<4?"1px solid #dcfce7":"none"}}>
+        <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:3}}>{q}</div>
+        <div style={{direction:"ltr",color:C.green,fontWeight:600,fontSize:11}}>► {en}</div>
+        <div style={{color:C.muted,fontSize:10,marginTop:1}}>◄ {ar}</div>
+      </div>))}
+  </Card></>);
+default:return null;}}
+
+// ══ UNIT 4 ══════════════════════════════════════════════════════════════════
+function RenderU4({tab}){switch(tab){
+case 0:return(<>
+  <Card icon="🌿" ar="الحياة البرية" en="Wild Life — South of Iraq" color={C.green}>
+    <div style={{background:"#e8f5e9",border:`2px solid ${C.green}`,borderRadius:9,padding:11,direction:"ltr"}}>
+      <div style={{fontWeight:700,color:C.navy,marginBottom:5,fontSize:12}}>📖 Passage</div>
+      <div style={{background:"#fff",borderRadius:7,padding:10,fontSize:11,color:"#333",lineHeight:1.9}}>
+        The wild life in the south of Iraq is very natural. People raise sheep and cattle.
+        They plant rice, wheat and barley. They live in arched houses. They use boats for transport.
+        You can see birds like herons flamingo. Some people live on fishing.
+        There are different kinds of fish in the marshes.
+      </div>
+    </div>
+    <div style={{marginTop:9,background:"#f1f8e9",borderRadius:9,padding:9,direction:"rtl"}}>
+      <div style={{fontWeight:800,color:C.green,marginBottom:5,fontSize:12}}>📖 الترجمة</div>
+      <div style={{fontSize:11,color:"#333",lineHeight:1.9}}>
+        الحياة البرية في جنوب العراق طبيعية جدا. الناس يربون الأغنام والأبقار. يزرعون الأرز والقمح والشعير.
+        يعيشون في منازل مقوسة. يستخدمون القوارب للنقل. يمكنك أن ترى الطيور مثل المالك الحزين والفلامنغو.
+        بعض الناس يعيشون على الصيد. هناك أنواع مختلفة من الأسماك في الأهوار.
+      </div>
+    </div>
+  </Card></>);
+case 1:return(<>
+  <Card icon="🧑" ar="قصة حياة إبراهيم" en="Ibrahim's Life Story — P.56" color={C.teal}>
+    <Tip icon="📌">سؤال امتحاني متكرر — (2017-1) (2018-2)</Tip>
+    {[{q:"1. Where was Ibrahim's small village?",en:"It was in the south of Iraq.",ar:"كانت في جنوب العراق"},
+      {q:"2. What did he look after for his father?",en:"He looked after his father's goats and chickens.",ar:"كان يعتني بماعز ودجاجات والده"},
+      {q:"3. Why did Ibrahim ask lots of questions?",en:"Because he was interested in animals from an early age.",ar:"لأنه كان مهتماً بالحيوانات منذ الصغر"},
+      {q:"5. Why did Ibrahim move to Baghdad?",en:"Because his father got a new job there / with Iraq petroleum.",ar:"لأن والده حصل على وظيفة جديدة هناك"},
+      {q:"6. What did he learn from Pierre?",en:"He learnt to speak French and learnt about France.",ar:"تعلم التحدث بالفرنسية وتعلم عن فرنسا"},
+      {q:"7. Why did Ibrahim want to be a zoologist?",en:"So that he could study animals in different countries.",ar:"لكي يتمكن من دراسة الحيوانات في مختلف البلدان"},
+      {q:"8. Where is Ibrahim writing his book?",en:"He is writing his book in France.",ar:"يكتب كتابه في فرنسا"},
+    ].map(({q,en,ar},i)=>(
+      <div key={i} style={{padding:"7px 0",borderBottom:i<6?"1px solid #e0f2f1":"none"}}>
+        <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:3}}>{q}</div>
+        <div style={{direction:"ltr",color:C.teal,fontWeight:600,fontSize:11}}>► {en}</div>
+        <div style={{color:C.muted,fontSize:10,marginTop:1}}>◄ {ar}</div>
+      </div>))}
+  </Card></>);
+case 2:return(<>
+  <Card icon="⏰" ar="while / when / as — ربط الأزمنة" en="Linking Past Tenses" color={C.purple}>
+    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      <div style={{background:"#f3e5f5",border:`2px solid ${C.purple}`,borderRadius:9,padding:10}}>
+        <div style={{fontWeight:800,color:C.purple,fontSize:12,marginBottom:5}}>📌 While / As → ماضي مستمر</div>
+        <Fm text="was/were + V-ing + While/As + V1 (past simple)" color={C.purple}/>
+        <Ex en="Ahmed went out while Sami was writing the homework." color={C.purple}/>
+      </div>
+      <div style={{background:"#e8f5e9",border:`2px solid ${C.green}`,borderRadius:9,padding:10}}>
+        <div style={{fontWeight:800,color:C.green,fontSize:12,marginBottom:5}}>📌 When / And → ماضي بسيط</div>
+        <Fm text="V1 (past simple) + when + was/were + V-ing" color={C.green}/>
+        <Ex en="He was eating fish when Luma entered the room." color={C.green}/>
+      </div>
+    </div>
+    <Quiz accent={C.purple} qs={[
+      {q:"He was eating when Luma ……. (enter) the room.",opts:["entered","was entering","enters"],a:"entered"},
+      {q:"Ahmed ……. out while Sami was writing.",opts:["went","was going","goes"],a:"went"},
+    ]}/>
+  </Card></>);
+case 3:return(<>
+  <Card icon="📰" ar="أخبار العراق الصباحية" en="Iraqi Morning News" color={C.blue}>
+    <Tip icon="📌">سؤال امتحاني — (2017-Feb)</Tip>
+    {[{q:"1. Where did the Iraqi minister arrive? When?",en:"He arrived in London yesterday.",ar:"وصل إلى لندن أمس"},
+      {q:"2. What did the meeting focus on?",en:"Discussing development programs between countries.",ar:"مناقشة برامج التنمية بين البلدان"},
+      {q:"3. What was the minister's suggestion?",en:"Opening English schools in Iraq to develop English language learning.",ar:"افتتاح مدارس الإنجليزية في العراق"},
+      {q:"4. Who welcomed the Iraqi minister?",en:"British Minister of Education welcomed the Iraqi minister.",ar:"وزير التعليم البريطاني رحب بالوزير العراقي"},
+      {q:"5. What did the sport's minister open in Basra?",en:"He opened a new sports city in Basra yesterday.",ar:"افتتح مدينة رياضية جديدة في البصرة"},
+    ].map(({q,en,ar},i)=>(
+      <div key={i} style={{padding:"7px 0",borderBottom:i<4?"1px solid #e0e7ff":"none"}}>
+        <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:3}}>{q}</div>
+        <div style={{direction:"ltr",color:C.blue,fontWeight:600,fontSize:11}}>► {en}</div>
+        <div style={{color:C.muted,fontSize:10,marginTop:1}}>◄ {ar}</div>
+      </div>))}
+  </Card></>);
+default:return null;}}
+
+// ══ UNIT 5 ══════════════════════════════════════════════════════════════════
+function RenderU5({tab}){switch(tab){
+case 0:return(<>
+  <Card icon="👩‍⚕️" ar="قصة نوال — طبيبة الأسنان" en="Nawal's Story — P.61" color={C.pink}>
+    {[{q:"1. What was Nawal doing before she became famous?",en:"She was reading a lot and keeping in touch with other dentists.",ar:"كانت تقرأ كثيراً وتبقى على اتصال مع أطباء الأسنان"},
+      {q:"2. What changed Nawal's life?",en:"A bleeding gun.",ar:"رصاصة دامية"},
+      {q:"3. What did Nawal do next?",en:"She participated in workshops on using lasers.",ar:"شاركت في ورش عمل حول استخدام الليزر"},
+      {q:"4. What does Nawal's new clinic look like?",en:"The new clinic is large and uses modern equipment.",ar:"العيادة كبيرة وتستخدم المعدات الحديثة"},
+      {q:"5. How did modern equipment help her?",en:"It made her work more successful.",ar:"جعلت عملها أكثر نجاحاً"},
+      {q:"6. Who does Nawal offer free treatment to?",en:"Poor families and the families of Iraqi soldiers.",ar:"الأسر الفقيرة وأسر الجنود العراقيين"},
+    ].map(({q,en,ar},i)=>(
+      <div key={i} style={{padding:"7px 0",borderBottom:i<5?"1px solid #fce4ec":"none"}}>
+        <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:3}}>{q}</div>
+        <div style={{direction:"ltr",color:C.pink,fontWeight:600,fontSize:11}}>► {en}</div>
+        <div style={{color:C.muted,fontSize:10,marginTop:1}}>◄ {ar}</div>
+      </div>))}
+    <MF items={[
+      {m:"Nawal used old equipment in her new clinic.",f:false,n:"خطأ — تستخدم معدات حديثة"},
+      {m:"A bleeding gun changed Nawal's life.",f:true,n:"صحيح ✅"},
+      {m:"Nawal offers free treatment to rich families.",f:false,n:"خطأ — الأسر الفقيرة وأسر الجنود"},
+    ]}/>
+  </Card></>);
+case 1:return(<>
+  <Card icon="📝" ar="اكتب عن حياتك" en="Write about your life — P.53" color={C.blue}>
+    <Tip icon="📌">سؤال امتحاني متكرر — (2017-1) (2017-3) (2018-2)</Tip>
+    <div style={{background:"#e3f2fd",border:`2px solid ${C.blue}`,borderRadius:9,padding:11,direction:"ltr",marginBottom:10}}>
+      <div style={{fontWeight:700,color:C.navy,marginBottom:5,fontSize:12}}>📝 Sample Paragraph</div>
+      <div style={{background:"#fff",borderRadius:7,padding:10,fontSize:11,color:"#333",lineHeight:1.9}}>
+        My name is Ali. I was born in Karbala'a and I also live in it with my family.
+        I have two sisters Huda and Muna. My childhood dream was to become an English teacher.
+        My favorite lesson was English. My favorite hobby is painting and I like playing football.
+        I love reading novels in my spare time. In the future, I believe I will be a brilliant teacher.
+      </div>
+    </div>
+    <div style={{background:"#f0f4ff",borderRadius:9,padding:9}}>
+      <div style={{fontWeight:800,color:C.navy,marginBottom:6,fontSize:12}}>🔑 عناصر الكتابة عن الحياة</div>
+      <div style={{display:"flex",flexWrap:"wrap",gap:5}}>
+        {["الاسم","مكان الولادة","العائلة","حلم الطفولة","المادة المفضلة","الهواية","المستقبل"].map(t=>(
+          <span key={t} style={{background:C.blue,color:"#fff",borderRadius:16,padding:"2px 10px",fontSize:10,fontWeight:700}}>{t}</span>))}
+      </div>
+    </div>
+  </Card></>);
+case 2:return(<>
+  <Card icon="📺" ar="اكتب عن برنامج تلفزيوني" en="Write about a T.V. Program — P.60" color={C.green}>
+    <Tip icon="📌">سؤال امتحاني — (2017-3) (2018-1)</Tip>
+    <div style={{background:"#e8f5e9",border:`2px solid ${C.green}`,borderRadius:9,padding:11,direction:"ltr"}}>
+      <div style={{fontWeight:700,color:C.navy,marginBottom:5,fontSize:12}}>📺 Sample Paragraph — Blue Whale</div>
+      <div style={{background:"#fff",borderRadius:7,padding:10,fontSize:11,color:"#333",lineHeight:1.9}}>
+        I watched a good program last night. It was about the largest animal alive today "Blue whale".
+        It was very interesting. It is a huge animal about 29 metres long. Unfortunately,
+        whales were hunted for their oil and almost disappeared, but now they are protected.
+        I enjoyed watching the report. It was very exciting.
+      </div>
+    </div>
+  </Card></>);
+case 3:return(<>
+  <Card icon="📰" ar="Story 3 — درس قوي للجميع" en="A Powerful Lesson for Everyone — P.61" color={C.purple}>
+    {[{q:"1. What was the special offer of Al-Sabah newspaper?",en:"Two young students from local schools can work as reporters in the summer holidays.",ar:"طالبان يستطيعان العمل كصحفيين في العطلة الصيفية"},
+      {q:"2. Who was the lucky boy? How old was he?",en:"Salam Ahmed was the lucky boy. He was 15 years old.",ar:"كان سلام أحمد المحظوظ. عمره 15 عاماً"},
+      {q:"3. What did the editor say to the reporters?",en:"'A big new restaurant is opening in Baghdad next Tuesday. I need someone to write a good report.'",ar:"مطعم جديد كبير يفتح في بغداد يوم الثلاثاء المقبل"},
+    ].map(({q,en,ar},i)=>(
+      <div key={i} style={{padding:"7px 0",borderBottom:i<2?"1px solid #f0e6ff":"none"}}>
+        <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:3}}>{q}</div>
+        <div style={{direction:"ltr",color:C.purple,fontWeight:600,fontSize:11}}>► {en}</div>
+        <div style={{color:C.muted,fontSize:10,marginTop:1}}>◄ {ar}</div>
+      </div>))}
+  </Card></>);
+default:return null;}}
+
+// ══ UNIT 6 ══════════════════════════════════════════════════════════════════
+function RenderU6({tab}){switch(tab){
+case 0:return(<>
+  <Card icon="👔" ar="الوظائف — Jobs" en="Unit Six — Jobs & Professions" color={C.brown}>
+    <Tip>ربط المهنة بالوظيفة: <strong>X is someone who + verb(s)</strong></Tip>
+    <Fm text="job + is someone who + verb(s)" color={C.brown}/>
+    {[["Fire fighter","is someone who puts out fires","رجل الإطفاء يخمد الحرائق"],
+      ["Mechanic","is a person who repairs engines of cars","الميكانيكي يصلح محركات السيارات"],
+      ["Doctor","is someone who helps sick people and works in hospital","الطبيب يساعد المرضى في المستشفى"],
+      ["Waiter","is a person who works in the restaurant","النادل يعمل في المطعم"],
+      ["Teacher","is a person who teaches especially in school","المعلم يدرّس في المدرسة"],
+      ["Shop assistant","is a person who works in a shop","المساعد يعمل في متجر"],
+    ].map(([job,def,ar])=>(
+      <div key={job} style={{padding:"6px 0",borderBottom:"1px solid #f5f5f5"}}>
+        <div style={{display:"flex",gap:8,alignItems:"flex-start",direction:"ltr"}}>
+          <span style={{background:C.brown,color:"#fff",borderRadius:7,padding:"2px 9px",fontSize:11,fontWeight:900,flexShrink:0}}>{job}</span>
+          <div>
+            <div style={{fontSize:11,fontWeight:600,color:"#333"}}>{def}</div>
+            <div style={{fontSize:10,color:C.muted}}>{ar}</div>
+          </div>
+        </div>
+      </div>))}
+    <div style={{marginTop:9,background:"#efebe9",borderRadius:8,padding:9,border:`1.5px solid ${C.brown}`}}>
+      <div style={{fontWeight:800,color:C.brown,fontSize:11,marginBottom:4}}>AB. A. Page 75</div>
+      <div style={{direction:"ltr",fontSize:11}}>1-help customers | 2-put out fires | 3-repair cars | 4-run a business | 5-save lives | 6-take orders | 7-take care of sick people</div>
+    </div>
+    <Quiz accent={C.brown} qs={[
+      {q:"The teacher is someone who ……. his students.",opts:["teaches","teach","teaching"],a:"teaches"},
+      {q:"The firefighter is someone who ……. out fires.",opts:["puts","put","putting"],a:"puts"},
+      {q:"Who usually works outside?",opts:["Pilot, policeman, photographer","Doctor, teacher","Waiter, cook"],a:"Pilot, policeman, photographer"},
+    ]}/>
+  </Card></>);
+case 1:return(<>
+  <Card icon="🏫" ar="مدرسة المستقبل" en="The School of the Future — P.66" color={C.indigo}>
+    <Tip icon="📌">سؤال امتحاني — (2017-1)</Tip>
+    {[{q:"1. How will teaching and learning take place in the future?",en:"It will take place over the computers connected to the internet in student's own home.",ar:"على الكمبيوتر المرتبط بالإنترنت في منزل الطالب"},
+      {q:"2. How will students communicate and discuss work?",en:"They will use the internet to communicate and discuss work with other students.",ar:"سيستخدمون الإنترنت للتواصل ومناقشة العمل"},
+      {q:"3. Where will young people interested in science study?",en:"At special buildings designed for those subjects.",ar:"في المباني الخاصة المصممة لهذه المواضيع"},
+      {q:"4. What is the importance of Global Education?",en:"It's important for people who have special interest in something.",ar:"المهم للأشخاص الذين لديهم اهتمام خاص"},
+    ].map(({q,en,ar},i)=>(
+      <div key={i} style={{padding:"7px 0",borderBottom:i<3?"1px solid #e8eaf6":"none"}}>
+        <div style={{fontWeight:700,color:C.navy,fontSize:11,marginBottom:3}}>{q}</div>
+        <div style={{direction:"ltr",color:C.indigo,fontWeight:600,fontSize:11}}>► {en}</div>
+        <div style={{color:C.muted,fontSize:10,marginTop:1}}>◄ {ar}</div>
+      </div>))}
+  </Card></>);
+case 2:return(<>
+  <Card icon="🌍" ar="الملخص الشامل — جميع الوحدات" en="Grand Review — All Units 1–6" color={C.gold}>
+    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:7}}>
+      {[{i:"📍",u:"1",t:"There is/are",d:"is + مفرد | are + جمع"},
+        {i:"🕐",u:"1",t:"Telling Time",d:"o'clock → past → to → quarter → half"},
+        {i:"⏱️",u:"1",t:"Present Cont.",d:"am/is/are + verb-ing + now/today"},
+        {i:"🕰️",u:"1",t:"Past Cont.",d:"was/were + verb-ing + when/while"},
+        {i:"🎯",u:"2",t:"Present Simple",d:"verb+s (he/she/it) | doesn't/don't"},
+        {i:"🎭",u:"2",t:"أفعال الرغبة",d:"love/like/enjoy/hate + verb-ing"},
+        {i:"💡",u:"2",t:"Suggestions",d:"How about+ing | Let's+go | Why not?"},
+        {i:"📊",u:"3",t:"Comparative",d:"er/est | more/most | good→better→best"},
+        {i:"🔀",u:"3",t:"Conditional",d:"1st: If+V1,will | 2nd: If+past,would"},
+        {i:"↔️",u:"3",t:"as...as",d:"X is as adj as Y | X isn't as adj as Y"},
+        {i:"⏰",u:"4",t:"while/when",d:"while+Past Cont. | when+Past Simple"},
+        {i:"👔",u:"6",t:"Job Definition",d:"X is someone who + verb(s)"},
+      ].map(({i,u,t,d})=>(
+        <div key={t} style={{background:"#fff",border:"1.5px solid #ffc107",borderRadius:8,padding:8,display:"flex",gap:6,alignItems:"flex-start"}}>
+          <span style={{fontSize:16}}>{i}</span>
+          <div>
+            <div style={{display:"flex",gap:4,alignItems:"center"}}>
+              <div style={{fontWeight:800,color:C.navy,fontSize:11}}>{t}</div>
+              <span style={{background:C.gold,color:C.navy,borderRadius:10,padding:"0 5px",fontSize:9,fontWeight:800}}>U{u}</span>
+            </div>
+            <div style={{fontSize:10,color:C.muted}}>{d}</div>
+          </div>
+        </div>))}
+    </div>
+    <div style={{marginTop:14,background:"linear-gradient(135deg,#0d1b4e,#1565c0)",borderRadius:10,padding:12,textAlign:"center"}}>
+      <div style={{color:C.gold,fontWeight:900,fontSize:18,marginBottom:4}}>🏆 بالتوفيق والنجاح</div>
+      <div style={{color:"rgba(255,255,255,.9)",fontSize:13,fontWeight:700}}>{AUTHOR}</div>
+      <div style={{color:"rgba(255,255,255,.6)",fontSize:11,marginTop:2}}>ملزمة اللغة الإنجليزية — الصف الثالث المتوسط — Units 1–6</div>
+    </div>
+  </Card></>);
+default:return null;}}
+
+// ══ MAIN APP ════════════════════════════════════════════════════════════════
+function App(){
+  const [unitIdx,setUnitIdx]=useState(0);
+  const [tab,setTab]=useState(0);
+  const [done,setDone]=useState({});
+
+  const unit=UNITS[unitIdx];
+  const sections=UNIT_TABS[unitIdx];
+  const totalSec=UNIT_TABS.reduce((s,u)=>s+u.length,0);
+  const doneCount=Object.keys(done).length;
+
+  const mark=()=>{
+    const key=`${unitIdx}-${tab}`;
+    if(!done[key])setDone(d=>({...d,[key]:true}));
+    if(tab<sections.length-1)setTab(t=>t+1);
+    else if(unitIdx<UNITS.length-1){setUnitIdx(u=>u+1);setTab(0);}
+  };
+
+  const renderSection=()=>{
+    if(unitIdx===0)return React.createElement(RenderU1,{tab});
+    if(unitIdx===1)return React.createElement(RenderU2,{tab});
+    if(unitIdx===2)return React.createElement(RenderU3,{tab});
+    if(unitIdx===3)return React.createElement(RenderU4,{tab});
+    if(unitIdx===4)return React.createElement(RenderU5,{tab});
+    if(unitIdx===5)return React.createElement(RenderU6,{tab});
+    return null;
+  };
+
+  return(
+    <div style={{minHeight:"100vh",background:"linear-gradient(160deg,#0d1b4e 0%,#1a3a8f 40%,#0096c7 100%)",
+      fontFamily:"'Segoe UI',Tahoma,sans-serif",direction:"rtl"}}>
+
+      {/* HEADER */}
+      <div style={{background:"linear-gradient(90deg,#ffd60a,#f4811f)",
+        padding:"11px 18px",display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+        <div>
+          <div style={{color:C.navy,fontWeight:900,fontSize:17}}>📚 المراجعة الشاملة للغة الإنجليزية</div>
+          <div style={{color:C.navy,fontSize:11,fontWeight:600}}>English Mastery Toolkit — Units 1–6 | الصف الثالث المتوسط</div>
+        </div>
+        <div style={{textAlign:"left"}}>
+          <div style={{color:C.navy,fontSize:11,fontWeight:700}}>{AUTHOR}</div>
+          <div style={{background:C.navy,color:C.gold,borderRadius:16,padding:"2px 10px",fontSize:11,fontWeight:800,marginTop:2}}>
+            {doneCount}/{totalSec} مكتمل
+          </div>
+        </div>
+      </div>
+
+      {/* PROGRESS */}
+      <div style={{background:"rgba(255,255,255,.15)",height:5}}>
+        <div style={{height:"100%",background:C.gold,width:`${(doneCount/totalSec)*100}%`,transition:"width .5s",borderRadius:3}}/>
+      </div>
+
+      {/* UNIT TABS */}
+      <div style={{display:"flex",overflowX:"auto",gap:3,padding:"8px 12px 0",background:"rgba(0,0,0,.25)"}}>
+        {UNITS.map((u,i)=>(
+          <button key={u.id} onClick={()=>{setUnitIdx(i);setTab(0);}} style={{
+            padding:"7px 14px",border:"none",borderRadius:"10px 10px 0 0",
+            background:unitIdx===i?u.color:"rgba(255,255,255,.12)",
+            color:unitIdx===i?"#fff":"rgba(255,255,255,.7)",
+            fontWeight:800,fontSize:12,cursor:"pointer",whiteSpace:"nowrap",transition:"all .15s",
+            borderBottom:unitIdx===i?`3px solid ${C.gold}`:"3px solid transparent"}}>
+            {u.label}
+          </button>))}
+      </div>
+
+      {/* SECTION TABS */}
+      <div style={{display:"flex",overflowX:"auto",gap:4,padding:"6px 12px",background:"rgba(0,0,0,.15)"}}>
+        {sections.map((s,i)=>(
+          <button key={i} onClick={()=>setTab(i)} style={{
+            padding:"5px 12px",borderRadius:16,border:"none",
+            background:tab===i?unit.color:"rgba(255,255,255,.13)",
+            color:tab===i?"#fff":"rgba(255,255,255,.7)",
+            fontWeight:700,fontSize:11,cursor:"pointer",whiteSpace:"nowrap",transition:"all .15s",
+            display:"flex",alignItems:"center",gap:3}}>
+            {s.icon} {s.label}
+            {done[`${unitIdx}-${i}`]&&<span style={{fontSize:9}}>✅</span>}
+          </button>))}
+      </div>
+
+      {/* UNIT TITLE BANNER */}
+      <div style={{padding:"10px 14px 0"}}>
+        <div style={{background:`linear-gradient(135deg,${unit.color},${unit.color}aa)`,
+          borderRadius:12,padding:"9px 14px",display:"flex",alignItems:"center",gap:9}}>
+          <span style={{fontSize:22}}>{sections[tab]?.icon}</span>
+          <div>
+            <div style={{color:"#fff",fontWeight:900,fontSize:15}}>{unit.label} — {sections[tab]?.label}</div>
+            <div style={{color:"rgba(255,255,255,.75)",fontSize:11}}>{unit.sub}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* CONTENT */}
+      <div style={{padding:"12px 14px",maxWidth:860,margin:"0 auto"}}>
+        {renderSection()}
+        <button onClick={mark} style={{width:"100%",padding:"11px",borderRadius:10,border:"none",
+          background:done[`${unitIdx}-${tab}`]?C.gold:unit.color,
+          color:done[`${unitIdx}-${tab}`]?C.navy:"#fff",
+          fontWeight:800,fontSize:13,cursor:"pointer",marginTop:4}}>
+          {done[`${unitIdx}-${tab}`]
+            ?(tab<sections.length-1?"← القسم التالي":unitIdx<UNITS.length-1?"← الوحدة التالية":"🏆 أتممت جميع الوحدات!")
+            :"✅ انتهيت من هذا القسم"}
+        </button>
+        <div style={{textAlign:"center",marginTop:14,color:"rgba(255,255,255,.4)",fontSize:11,paddingBottom:20}}>
+          إعداد {AUTHOR} • English Mastery Toolkit • Units 1–6 • الثالث المتوسط
+        </div>
+      </div>
+    </div>);
+}
+
+const root=ReactDOM.createRoot(document.getElementById("root"));
+root.render(React.createElement(App));
+</script>
+</body>
+</html>
